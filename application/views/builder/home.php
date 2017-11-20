@@ -92,11 +92,11 @@
     
         <!-- <a href="#exportModal" id="exportPage" data-toggle="modal" class="btn btn-primary pull-right disabled actionButtons"><span class="fui-export"></span> Export</a> -->
       
-      <a href="#" id="savePage" class="btn btn-primary pull-right disabled actionButtons"><span class="fui-check"></span> <span class="bLabel">Tidak ada perubahan!</span></a>
+      <a href="#" id="savePage" class="btn btn-primary pull-right disabled actionButtons saveBtn"><span class="fui-check"></span> <span class="bLabel">Tidak ada perubahan!</span></a>
 
       <a href="/link/to/my/website" class="btn btn-primary pull-right actionButtons" target="_blank"><span class="fa fa-link"></span>&nbsp; Lihat Website</a>
 
-      <a href="<?= base_url(); ?>member" class="btn btn-primary pull-right actionButtons"><span class="fa fa-dashboard"></span>&nbsp; Dashboard</a>
+      <a href="<?= base_url(); ?>member" id="dashboard" class="btn btn-primary pull-right"><span class="fa fa-dashboard"></span>&nbsp; Dashboard</a>
       
         <div class="modes">
         
@@ -794,7 +794,7 @@
         <div class="modal-content">
             <div class="modal-body">
             
-              Are you sure you want to remove this page?
+              Apakah anda yakin ingin menghapus halaman ini?
               
             </div><!-- /.modal-body -->
             <div class="modal-footer">
@@ -891,28 +891,131 @@
     <script src="<?= $builderAssets; ?>js/src-min-noconflict/ace.js"></script>
     <script src="<?= base_url(); ?>builder/elements.json"></script>
     <script src="<?= $builderAssets; ?>js/builder.js"></script>
-    <script>
+    <script type="text/javascript">
+
+    var ua = window.navigator.userAgent;
+    var msie = ua.indexOf("MSIE ");
     
-    $(function(){
-    
-      var ua = window.navigator.userAgent;
-      var msie = ua.indexOf("MSIE ");
-      
-      /*if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
-          
-        $('.modes #modeContent').parent().hide();
-          
-      } else {
-          
-        $('.modes #modeContent').parent().show();
+    /*if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
         
-      }*/
+      $('.modes #modeContent').parent().hide();
+        
+    } else {
+        
+      $('.modes #modeContent').parent().show();
       
-      
-      
-      
-    })    
+    }*/
     
+    function loadStorage()
+    {
+      console.log('loaded loadStorage()');
+      for(x=0; x<=99; x++) {
+    
+        localStorage.removeItem("blocksElement"+x);
+        localStorage.removeItem("blocksFrame"+x);
+        
+      }
+      
+      localStorage.removeItem("pageNames");
+
+      $.ajax
+      ({
+          type: "GET",
+          async: false,
+          url: '<?= base_url() ?>web-builder/generatefile',
+          data: { 'site': '<?= $site; ?>' },
+          success: function (rs) { 
+            // console.log('JSON.Stringfy value is ' + JSON.stringify(rs));  
+              // console.log('Value is ' + rs);
+              var storage = JSON.parse(rs);
+              console.log('value storage is ' + storage);
+              var numObj = Object.keys(storage).length;
+              console.log('length is - ' + numObj);
+              for ( var i = 0; i < numObj; i++)
+              {
+                var key = Object.keys(storage)[i];
+                var value = storage[key];
+                console.log('key: ' + key + ' value: ' + value);
+                // console.log(Object.keys(storage)[i]);
+                localStorage.setItem(key, value);
+              }
+
+              console.log('localStorage() : ' + localStorage.getItem('blocksElement1')); 
+              console.log('localStorage() : ' + localStorage.getItem('pageNames')); 
+              console.log('localStorage() : ' + localStorage.getItem('blocksFrame1')); 
+          },
+          failure: function() { console.log("Error!");}
+      });
+    }
+    
+    $("#savePage").click(function() {
+      console.log("Save Page Clicked!");
+      $.ajax
+      ({
+          type: "GET",
+          async: false,
+          url: '<?= base_url() ?>web-builder/savefile',
+          data: { 'content': storageToStringfy(), 'site': '<?= $site; ?>' },
+          success: function () { console.log('Saved!'); },
+          failure: function() { console.log("Error!");}
+      });
+      setTimeout(loadStorage(), 2000);
+    });
+
+    // Modal Hapus Halaman confirm!
+    $('#deleteAll').on('click', '#deleteAllConfirm', function(){
+      // $.ajax
+      // ({
+      //     type: "GET",
+      //     async: false,
+      //     url: '<?= base_url() ?>web-builder/savefile',
+      //     data: { 'site': '<?= $site; ?>' },
+      //     success: function () { console.log('Saved!'); },
+      //     failure: function() { console.log("Error!");}
+      // });
+      deleteStorage();
+    });
+
+    $("#dashboard").click(function(){
+        deleteStorage();
+    });
+
+    function deleteStorage()
+    {
+      localStorage.clear();
+    }
+
+    function storageToStringfy()
+    {
+      var a = {};
+      for (var i = 0; i < localStorage.length; i++) {
+          var k = localStorage.key(i);
+          var v = localStorage.getItem(k);
+          a[k] = v;
+      }
+      var s = JSON.stringify(a);
+      
+      return s;
+    }
+
+    // function checkStorage()
+    // {
+    //     var storage = JSON.parse(storageToStringfy());
+    //     var numObj = Object.keys(storage).length;
+
+    //     for ( var i = 0; i < numObj; i++)
+    //     {
+    //       var key = localStorage.key(i);
+    //       var value = localStorage[key];
+
+    //       localStorage.setItem(key, value);
+    //     }
+
+    //     setTimeout(loadStorage, 3000);
+    // }
+
+    window.onload = loadStorage();
+    window.onbeforeunload = deleteStorage();
     </script>
   </body>
 </html>

@@ -51,7 +51,7 @@
 			if($product != "" && $product != 0){
 				$data['product']	= $this->db->get_where('packages',array("id_package" => $product))->result_array();
 				$data['my_detail']	= $this->db->select('*')->from('clients')->join('app_users as u', 'u.id_users = clients.user_id')
-									->where(array("id_client" => $this->user))->get()->result_array();
+									->where(array("id_client" => $this->session->userdata['is_active_cid']))->get()->result_array();
 
 
 				$this->load->view('template/header-member.php');
@@ -137,110 +137,109 @@
 			$voucher_detail = 	$this->session->userdata('cart_detail');
 			//	if cart not empty
 			if(is_array($voucher_detail)){
-				foreach($voucher_detail as $voucher_detail){
-					$id_voucher		=	$voucher_detail['cart_id_voucher'];
-					$kode_voucher	=	$voucher_detail['cart_kode_voucher'];	
+				$id_voucher		=	$voucher_detail['cart_id_voucher'];
+				$kode_voucher	=	$voucher_detail['cart_kode_voucher'];	
 
 
-					// get package detail of voucher
-					$voucher 	=  $this->db->query("SELECT * FROM vouchers
-	        								JOIN packages ON vouchers.id_package = packages.id_package
-	        								WHERE vouchers.code = '$kode_voucher' AND vouchers.id_voucher = '$id_voucher' AND vouchers.status = 0 LIMIT 1")->result_array();
-					// if voucher available
-					if($voucher){
-							$domain			=	$voucher[0]['domain'];
-							$email 			=	$voucher[0]['email'];
-							$bandwidth 		=	$voucher[0]['bandwidth'];
-							$storage		= 	$voucher[0]['storage'];
-							$active 		=	$voucher[0]['active_period'];
-							$price 			=	$voucher[0]['price'];
+				// get package detail of voucher
+				$voucher 	=  $this->db->query("SELECT * FROM vouchers
+        								JOIN packages ON vouchers.id_package = packages.id_package
+        								WHERE vouchers.code = '$kode_voucher' AND vouchers.id_voucher = '$id_voucher' AND vouchers.status = 0 LIMIT 1")->result_array();
+				// if voucher available
+				if($voucher){
+						$domain			=	$voucher[0]['domain'];
+						$email 			=	$voucher[0]['email'];
+						$bandwidth 		=	$voucher[0]['bandwidth'];
+						$storage		= 	$voucher[0]['storage'];
+						$active 		=	$voucher[0]['active_period'];
+						$price 			=	$voucher[0]['price'];
 
-							// continue
-							$today			= date("Y-m-d");
-							$start_date 	= $today;
-							$end_date		= date("Y-m-d", strtotime("+".$active." days"));
+						// continue
+						$today			= date("Y-m-d");
+						$start_date 	= $today;
+						$end_date		= date("Y-m-d", strtotime("+".$active." days"));
 
-							// check user package
-							$is_user_package	=	$this->db->get_where("clients_package", array("id_client" => $this->user_id))->num_rows();
+						// check user package
+						$is_user_package	=	$this->db->get_where("clients_package", array("client_id" => $this->user_id))->num_rows();
 
-							// check user package
-							if($is_user_package > 0) {
-								$user_package		=	$this->db->get_where("clients_package", array("id_client" => $this->user_id))->result_array();
-								$package_domain		=	$user_package[0]['domain'];
-								$package_email		=	$user_package[0]['email'];
-								$package_bandwidth	=	$user_package[0]['bandwidth'];
-								$package_storage	=	$user_package[0]['storage'];
-								$package_period		=	$user_package[0]['active_period'];
-								$package_start		=	$user_package[0]['start_date'];
-								$package_end		=	$user_package[0]['end_date'];
+						// check user package
+						if($is_user_package > 0) {
+							$user_package		=	$this->db->get_where("clients_package", array("client_id" => $this->user_id))->result_array();
+							$package_domain		=	$user_package[0]['domain'];
+							$package_email		=	$user_package[0]['email'];
+							$package_bandwidth	=	$user_package[0]['bandwidth'];
+							$package_storage	=	$user_package[0]['storage'];
+							$package_period		=	$user_package[0]['active_period'];
+							$package_start		=	$user_package[0]['start_date'];
+							$package_end		=	$user_package[0]['end_date'];
 
-								// if user already have active package
-								if($active > 0){
-									if($package_end > $today){
-										//add masa aktif
-										$end_date		= date("Y-m-d", strtotime($package_end." + ".$active." days"));
-										//start date dari yang lama
-										$start_date		= $package_start;
-									}
-
+							// if user already have active package
+							if($active > 0){
+								if($package_end > $today){
+									//add masa aktif
+									$end_date		= date("Y-m-d", strtotime($package_end." + ".$active." days"));
+									//start date dari yang lama
+									$start_date		= $package_start;
 								}
 
-								// add user package
-								$packagedata	= array("domain" => $package_domain + $domain,
-														"email" => $package_email + $email,
-														"bandwidth"	=> $package_bandwidth + $bandwidth,
-														"storage" => $package_storage + $storage,
-														"active_period" => $package_period + $active,
-														"start_date" => $start_date,
-														"end_date" => $end_date
-													);
-								$this->db->where('id_client', $this->user_id);
-								$this->db->update("clients_package",$packagedata);
-
 							}
-							else{
-								// set active package
-								$packagedata	= array("id_client" => $this->user_id,
-												"domain" => $domain,
-												"email" => $email,
-												"bandwidth"	=> $bandwidth,
-												"storage" => $storage,
-												"active_period" => $active,
-												"start_date" => $start_date,
-												"end_date" => $end_date
-											);
-								$this->db->insert("clients_package",$packagedata);
+
+							// add user package
+							$packagedata	= array("domain" => $package_domain + $domain,
+													"email" => $package_email + $email,
+													"bandwidth"	=> $package_bandwidth + $bandwidth,
+													"storage" => $package_storage + $storage,
+													"active_period" => $package_period + $active,
+													"start_date" => $start_date,
+													"end_date" => $end_date
+												);
+							$this->db->where('client_id', $this->user_id);
+							$this->db->update("clients_package",$packagedata);
+
+						}
+						else{
+							// set active package
+							$packagedata	= array("client_id" => $this->user_id,
+											"domain" => $domain,
+											"email" => $email,
+											"bandwidth"	=> $bandwidth,
+											"storage" => $storage,
+											"active_period" => $active,
+											"start_date" => $start_date,
+											"end_date" => $end_date
+										);
+							$this->db->insert("clients_package",$packagedata);
+				
+						}
+						
+						// update voucher as used
+						$use_voucher	=	array("status" => 1, "used_at" => date('Y-m-d H:i:s'));
+						$this->db->where('id_voucher', $id_voucher);
+						$this->db->update("vouchers",$use_voucher);
+
+						// simpan transaksi
+						$transaction_data	= array("client_id" => $this->user_id,
+												"date_transaction" => date("Y-m-d"),
+												"due_date" => date("Y-m-d"),
+												"date_payment" => date("Y-m-d"),
+												"date_transaction" => date("Y-m-d"),
+												"total" => $price,
+												"method" => 1,
+												"detail" => "Aktivasi voucher starter",
+												"status_payment" => 2,
+												"verified_by" => 1
+												);
+						$this->db->insert("transactions",$transaction_data);
+
+
+						//	empty cart
+						$this->session->unset_userdata('cart_detail');
+						
+
+						$this->session->set_flashdata("message", "Voucher baru telah diaktifkan");
+						redirect("store");
+				}
 					
-							}
-							
-							// update voucher as used
-							$use_voucher	=	array("status" => 1, "used_at" => date('Y-m-d H:i:s'));
-							$this->db->where('id_voucher', $id_voucher);
-							$this->db->update("vouchers",$use_voucher);
-
-							// simpan transaksi
-							$transaction_data	= array("id_client" => $this->user_id,
-													"date_transaction" => date("Y-m-d"),
-													"due_date" => date("Y-m-d"),
-													"date_payment" => date("Y-m-d"),
-													"date_transaction" => date("Y-m-d"),
-													"total" => $price,
-													"method" => 1,
-													"detail" => "Aktivasi voucher starter",
-													"status_payment" => 2,
-													"verified_by" => 1
-													);
-							$this->db->insert("transactions",$transaction_data);
-
-
-							//	empty cart
-							$this->session->unset_userdata('cart_detail');
-							
-
-							$this->session->set_flashdata("message", "Voucher baru telah diaktifkan");
-							redirect("store");
-					}
-				}	
 			}
 			// cart empty
 			else{

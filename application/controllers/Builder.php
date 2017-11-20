@@ -10,15 +10,19 @@ class Builder extends CI_Controller {
 	}
 	public function index()
 	{
-		if ( ! self::authUser()) redirect();
-
+		$getdata = $this->input->get();
+		if ( ! self::authUser() || ! isset($getdata['site'])) redirect();
+		
 		$data['builderAssets'] = base_url().'assets/builder/';
+		$data['site'] = $getdata['site'];
 		$this->load->view('builder/home', $data);
 	}
 	
 	/* Halaman */
 	public function halaman($action)
 	{
+		if ( ! self::authUser()) redirect();
+
 		$getdata = $this->input->get();
 
 		switch ( trim($action))
@@ -35,6 +39,30 @@ class Builder extends CI_Controller {
 				fclose($previewFile);
 				
 				redirect('web-builder/result?openid='.$fileName);
+			break;
+
+			case 'savefile':
+				if ( ! $getdata['site'] || ! $getdata['content']) redirect();
+
+				$myFile = FCPATH."site-member/{$getdata['site']}/generate.json";
+				$fh = fopen($myFile, 'w') or die("can't open file");
+				$stringData = $getdata["content"];
+				fwrite($fh, $stringData);
+				fclose($fh);
+			break;
+
+			case 'generatefile':
+				if ( ! $getdata['site']) redirect();
+
+				$generatefile = FCPATH.'site-member/'.$getdata['site'];
+
+				if ( file_exists($generatefile.'/generate.json'))
+				{
+					// day 2,load json file
+					$json = file_get_contents($generatefile.'/generate.json');
+				}
+				
+				echo file_exists($generatefile.'/generate.json') ? $json: 'gada';
 			break;
 
 			case 'result':

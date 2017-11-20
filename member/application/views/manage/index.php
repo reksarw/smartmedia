@@ -133,6 +133,11 @@
                                         <div class="preview-hover"></div>
                                         <img class="img-responsive" src="<?php echo base_url("assets");?>/img/demo/template-picture.jpg" alt="profile picture" />
                                     </div>
+                                    <?php
+                                    $draftHtml = "<br /><a href=\"#\">Publikasikan</a>";
+                                    $pubHtml = "<br /><a href=\"#\">Konsepkan</a>";
+                                    ?>
+                                    Status Website: <strong><?= $site['publish_site'] ? 'Publish'.$pubHtml : 'Draft'.$draftHtml; ?></strong>
                                 </div>
                                 <div class="col-md-6">
                                     <table class="table table-striped table-manage">
@@ -152,9 +157,9 @@
                                 </div>
                                 <div class="col-md-3">
                                     <p><a class="btn btn-action btn-edit <?php echo (!getStatusPackage() || $site['status_site'] != 1) ? 'disabled' : ''; ?>" href="<?php echo base_url('./../web-builder');?>" target="_blank"><i class="fa fa-edit"></i> Edit Site</a></p>
-
-                                    <p><a class="btn btn-action btn-view <?php echo (!getStatusPackage() || $site['status_site'] != 1) ? 'disabled' : ''; ?>" href="<?php echo sprintf($this->siteAddress, $site['address_site']) ?>" target="_blank"><i class="fa fa-desktop"></i> View Site</a></p>
-
+                                    <!-- <?php echo sprintf($this->siteAddress, $site['address_site']) ?> -->
+                                    <p><a class="btn btn-action btn-view <?php echo (!getStatusPackage() || $site['status_site'] != 1) ? 'disabled' : ''; ?>" href="/web-builder/?site=<?= $site['address_site']; ?>" target="_blank"><i class="fa fa-desktop"></i> View Site</a></p>
+                                    
                                     <p><a class="btn btn-action btn-delete <?php echo (!getStatusPackage() || $site['status_site'] != 1) ? 'disabled' : ''; ?>" href="<?php echo base_url('manage/deleteSite?addr='.$site['address_site']);?>"><i class="fa fa-trash-o"></i> Delete Site</a></p>
                                     <?php if ( $site['status_site'] != 1): ?>
                                         <p><a class="btn btn-action btn-edit" href="<?php echo base_url('manage/activeSite?addr='.$site['address_site']);?>"><i class="fa fa-check"></i> Aktifkan</a></p>

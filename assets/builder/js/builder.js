@@ -75,7 +75,7 @@ var editableContent = ['.editContent', 'input', 'p', 'h1', 'h2', 'h3', 'h4', 'h5
 /* FLAT UI PRO INITS */
 
 $(function(){
-
+	
 	// Tabs
 	$(".nav-tabs a").on('click', function (e) {
 	  e.preventDefault();
@@ -2943,7 +2943,7 @@ function savePage(e) {
 	
 	closeStyleEditor();
 	
-	e.preventDefault();
+	// e.preventDefault();
 	
 	
 	//delete all first

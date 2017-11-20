@@ -272,13 +272,13 @@ function pageEmpty() {
 	if( $('#pageList ul:visible > li').size() == 0 ) {
 	
 		$('#start').show();
-		
+		console.log('show addClass');
 		$('#frameWrapper').addClass('empty');
 	
 	} else {
 	
 		$('#start').hide();
-		
+		console.log('hide RemoveClass');
 		$('#frameWrapper').removeClass('empty');
 	
 	}
@@ -292,15 +292,20 @@ function allEmpty() {
 	if( $('#pageList li').size() == 0 ) {
 	
 		allEmpty = true;
+
+		console.log('allEmpty() true');
 	
 	} else {
 	
 		allEmpty = false;
-	
+
+		console.log('allEmpty() false');
 	}
 	
 	if( allEmpty ) {
-	
+		
+		console.log('allEmpty() if');
+
 		$('a.actionButtons').each(function(){
 		
 			$(this).addClass('disabled');
@@ -314,7 +319,9 @@ function allEmpty() {
 		});
 	
 	} else {
-	
+		
+		console.log('allEmpty() else');
+
 		$('header .modes input').each(function(){
 		
 			$(this).prop('disabled', false).parent().removeClass('disabled');
@@ -328,7 +335,6 @@ function allEmpty() {
 		});
 	
 	}
-	
 }
 
 
@@ -2649,15 +2655,14 @@ $(function(){
 	
 	//clear screen
 	$('#clearScreen').click(function(){
-	
+
 		$('#deleteAll').modal('show');
 		
 		$('#deleteAll').on('click', '#deleteAllConfirm', function(){
-		
-			$('#deleteAll').modal('hide');
-		
-			$('#pageList ul:visible li').fadeOut(500, function(){
 			
+			$('#deleteAll').modal('hide');
+			
+			$('#pageList ul:visible li').fadeOut(500, function(){
 				$(this).remove();
 					
 				pageEmpty();
@@ -2668,7 +2673,6 @@ $(function(){
 			
 			//remove possible sandboxes
 			$('#sandboxes iframe').each(function(){
-			
 				$(this).remove();
 			
 			})
@@ -2941,6 +2945,7 @@ $(function(){
 
 function savePage(e) {
 	
+	alert('test :(');
 	closeStyleEditor();
 	
 	e.preventDefault();
@@ -3043,7 +3048,7 @@ function savePage(e) {
 					
 		localStorage['blocksElement'+pageCounter] = JSON.stringify(blocksElement);
 		localStorage['blocksFrame'+pageCounter] = JSON.stringify(blocksFrame);
-		
+
 		pageCounter++;
 	
 	});
@@ -3061,9 +3066,8 @@ function savePage(e) {
 		c++;
 		
 	})
-	
+
 	localStorage['pageNames'] = JSON.stringify(pageNames);
-	
 	setPendingChanges(false)
 	
 }

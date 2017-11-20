@@ -6,11 +6,6 @@
 		body {
 			margin:0;
 		}
-
-		#footer {
-			position: fixed;
-			bottom:0px;
-		}
 	</style>
 </head>
 <body>
@@ -18,8 +13,5 @@
     Your browser doesn't support iframes
 </iframe>
 
-<div id="footer">
-	xx
-</div>
 </body>
 </html>
