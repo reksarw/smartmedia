@@ -52,7 +52,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $route['default_controller'] = 'home';
 $route['web-builder'] = 'builder';
 $route['web-builder/(:any)'] = 'builder/halaman/$1';
-$route['(:any)'] = 'home/viewsite/$1';
-$route['(:any)/(:any)'] = 'home/viewsite/$1/$2';
+$route['sitemember/(:any)'] = 'home/viewsite/$1';
+$route['sitemember/(:any)/(:any)'] = 'home/viewsite/$1/$2';
 $route['404_override'] = ''; // home
 $route['translate_uri_dashes'] = FALSE;

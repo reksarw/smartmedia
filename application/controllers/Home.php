@@ -48,68 +48,75 @@ class Home extends CI_Controller {
 		$sitesAvailable = null;
 		$selectSites = $this->db->get('sites');	
 
-		foreach( $selectSites->result() as $row)
+		if ( $selectSites->num_rows() > 0)
 		{
-			$sitesAvailable[] = $row->address_site;
-		}
-
-		if ( ! in_array($site, $sitesAvailable))
-		{
-			echo 'Oops website not found :(';
-		}
-		else
-		{
-			$this->site_dir .= $site.'/';
-
-			$siteFiles = $this->site_dir;
-
-			$indexFile = $this->site_dir.'index.html';
-
-			if ( $fileRequest == null && file_exists($indexFile))
+			foreach( $selectSites->result() as $row)
 			{
-				include $indexFile;
+				$sitesAvailable[] = $row->address_site;
+			}
+
+			if ( ! in_array($site, $sitesAvailable))
+			{
+				echo 'Oops website not found :(';
 			}
 			else
 			{
-				$dirs = null;
+				$this->site_dir .= $site.'/';
 
-				/* All data in Site Files */
-				foreach( scandir($siteFiles) as $fileName)
+				$siteFiles = $this->site_dir;
+
+				$indexFile = $this->site_dir.'index.html';
+
+				if ( $fileRequest == null && file_exists($indexFile))
 				{
-					if ( ! str_replace( array('..','.'), '' , $fileName))
-						continue;
-
-					$dirs[] = $fileName;
-				}
-
-				if ( $fileRequest != '')
-				{
-					$listdir = null;
-
-					foreach($dirs as $dir)
-					{
-						$replaceHtml = str_replace('.html', '', $dir);
-						$listdir[] = $replaceHtml;
-					}
-
-					if ( ! in_array($fileRequest, $listdir))
-					{
-						echo 'File tidak ditemukan :)';
-					}
-					else
-					{
-						$fileRequest .= '.html';
-						include $this->site_dir.$fileRequest;
-					}
+					include $indexFile;
 				}
 				else
 				{
-					$data['site_dir']	= $this->site_dir;
-					$data['directory'] 	= $dirs;
-					$data['mysite']		= $site;
-					$this->load->view('builder/site_dir', $data);
+					$dirs = null;
+
+					/* All data in Site Files */
+					foreach( scandir($siteFiles) as $fileName)
+					{
+						if ( ! str_replace( array('..','.'), '' , $fileName))
+							continue;
+
+						$dirs[] = $fileName;
+					}
+
+					if ( $fileRequest != '')
+					{
+						$listdir = null;
+
+						foreach($dirs as $dir)
+						{
+							$replaceHtml = str_replace('.html', '', $dir);
+							$listdir[] = $replaceHtml;
+						}
+
+						if ( ! in_array($fileRequest, $listdir))
+						{
+							echo 'File tidak ditemukan :)';
+						}
+						else
+						{
+							$fileRequest .= '.html';
+							include $this->site_dir.$fileRequest;
+						}
+					}
+					else
+					{
+						$data['site_dir']	= $this->site_dir;
+						$data['directory'] 	= $dirs;
+						$data['mysite']		= $site;
+						$this->load->view('builder/site_dir', $data);
+					}
 				}
 			}
+		}
+		else
+		{
+			echo 'Oops, website not found!';
 		}
 	}
 
